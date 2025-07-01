@@ -2,7 +2,6 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 
-// Load environment variables from .env
 dotenv.config();
 
 const app = express();
@@ -32,22 +31,23 @@ app.post("/chat", async (req, res) => {
 
     const data = await openaiRes.json();
 
-    // Optional: Log full response for debugging
-    console.log("🔎 OpenAI API response:", data);
+    // ✅ Log the full response for debugging
+    console.log("🔎 Full OpenAI response:", JSON.stringify(data, null, 2));
 
-    // Handle OpenAI errors
+    // ✅ Handle API-level errors
     if (data.error) {
-      console.error("❌ OpenAI error:", data.error);
+      console.error("❌ OpenAI API error:", data.error);
       return res.json({ reply: `⚠️ OpenAI error: ${data.error.message}` });
     }
 
-    const reply =
-      data.choices?.[0]?.message?.content?.trim() || "⚠️ No reply received.";
+    // ✅ Extract reply safely
+    const reply = data.choices?.[0]?.message?.content?.trim();
+    console.log("🧠 Extracted reply:", reply);
 
-    console.log("🧠 FluentNova replied:", reply);
-    res.json({ reply });
+    res.json({ reply: reply || "⚠️ No reply received." });
 
   } catch (err) {
+    // ✅ Catch network/server errors
     console.error("❌ Server error:", err.message);
     res
       .status(500)
